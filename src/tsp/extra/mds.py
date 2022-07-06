@@ -91,3 +91,20 @@ def do_mds(tsp: N_TSP, dimensions: int = 2) -> Tuple[N_TSP, N_TSP, float]:
     else:
         tsp2 = N_TSP.from_cities(V.astype(np.int))
     return tsp, tsp2, stress(tsp, tsp2)
+
+
+def do_nmds(tsp: N_TSP, dimensions: int = 2) -> Tuple[N_TSP, N_TSP, float]:
+    """Generate an MDS reconstruction of any TSP problem. If both problems are of dimension 2,
+    reconstruction will be scaled to match original as best as possible.
+
+    Args:
+        tsp (N_TSP): original problem
+        dimensions (int, optional): Dimension of MDS reconstruction. Defaults to 2.
+
+    Returns:
+        Tuple[N_TSP, N_TSP, float]: (original problem, reconstructed problem, stress-1)
+    """
+    mds = MDS(n_components=dimensions, metric=False, dissimilarity='precomputed')
+    V = mds.fit_transform(tsp.to_edge_matrix())
+    tsp2 = N_TSP.from_cities((V * 1000).astype(np.int))
+    return tsp, tsp2, stress(tsp, tsp2)
