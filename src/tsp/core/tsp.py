@@ -29,6 +29,7 @@ respectively.
 from typing import Callable, Iterable, Iterator, Tuple, Type, Union
 import itertools as it
 from numpy.typing import NDArray
+from numbers import Number
 import numpy.random as random
 import numpy as np
 
@@ -201,7 +202,7 @@ class N_TSP:
             float: tour length
         """
         s = list(tour)
-        if isinstance(s[0], int):
+        if isinstance(s[0], Number):
             return self.score_indices(s)
         return self.score_tour_segments(s)
 

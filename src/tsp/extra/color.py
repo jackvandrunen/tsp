@@ -19,7 +19,7 @@ class TSP_Color(N_TSP):
     """Container for a TSP-with-colors instance."""
 
     @classmethod
-    def generate_random(cls, n_colors: Iterable[int], w: int = 500, h: int = 500, penalty: float = 2.):
+    def generate_random(cls, n_colors: Iterable[int], w: int = 500, h: int = 500, r: int = 10, padding: int = 10, penalty: float = 2.):
         """Generate a new problem with uniformly-distributed random cities of different colors.
 
         Args:
@@ -29,16 +29,15 @@ class TSP_Color(N_TSP):
             h (int, optional): Height of problem. Defaults to 500.
             penalty (float, optional): Distance multiplier when traveling between colors. Defaults to 2.0.
         """
-        result = cls(w, h, penalty)
-        n_total = sum(n_colors)
-        while len(set(result.cities)) < n_total:
-            result = cls(w, h)
+        while True:
+            result = cls(w, h, penalty)
             for c, n in enumerate(n_colors):
                 for _ in range(n):
-                    x = random.randint(10, w - 10)
-                    y = random.randint(10, h - 10)
+                    x = random.randint(padding, w - padding)
+                    y = random.randint(padding, h - padding)
                     result.add_city(x, y, c)
-        return result
+            if min(d for _, __, d in N_TSP.from_cities(result.cities).to_edges()) >= r:
+                return result
 
     @classmethod
     def from_cities(cls, cities: Iterable[Tuple[Tuple[int, int], int]], w: int = 500, h: int = 500, penalty: float = 2.):
@@ -70,7 +69,7 @@ class TSP_Color(N_TSP):
             y (int): city y
             color (int): city color
         """
-        N_TSP.add_city(x, y)
+        N_TSP.add_city(self, x, y)
         self.colors = list(self.colors)
         self.colors.append(color)
         self.colors = np.array(self.colors)

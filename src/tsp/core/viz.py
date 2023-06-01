@@ -18,11 +18,10 @@ from numbers import Number
 from numpy.typing import NDArray
 import numpy as np
 from PIL import Image, ImageDraw
-from cv2 import cv2
 import matplotlib.pyplot as plt
 from matplotlib.axes import SubplotBase
 
-from tsp.core.tsp import N_TSP, TSP
+from tsp.core.tsp import TSP
 
 
 def _draw_edges_pil(im: Image, tsp: TSP, edges: Iterable[Tuple[int, int]]):
@@ -77,49 +76,6 @@ def visualize_mst_pil(tsp: TSP, mst: Iterable[Tuple[float, Tuple[int, int]]], pa
     _draw_cities_pil(im, tsp)
     im.thumbnail((tsp.w, tsp.h))
     im.save(path)
-
-
-def visualize_3d(tsp: N_TSP, tour: Iterable[Union[int, NDArray]], path: str, step: int = 1, time: int = 12):
-    """Generate and save visualization of 3D motion of a 3D TSP as an mp4.
-
-    Args:
-        tsp (N_TSP): the problem
-        tour (Iterable[Union[int, NDArray]]): tour either as indices of vertices or as segments
-        path (str): path to save
-        step (int, optional): Degrees to rotate per frame. Defaults to 1.
-        time (int, optional): Duration of generated video. Defaults to 12.
-    """
-    assert tsp.dimensions == 3
-    min_x, min_y, max_x, max_y = float('inf'), float('inf'), float('-inf'), float('-inf')
-    for alpha in range(0, 360, step):
-        for x, y, z in tsp.cities:
-            x_ = x*cos(radians(alpha)) + z*sin(radians(alpha))
-            y_ = y
-            min_x = min(min_x, x_)
-            min_y = min(min_y, y_)
-            max_x = max(max_x, x_)
-            max_y = max(max_y, y_)
-    min_x -= 10  # padding
-    min_y -= 10
-    max_x -= min_x - 10  # padding on max side
-    max_y -= min_y - 10
-    min_x, min_y, max_x, max_y = int(min_x), int(min_y), int(max_x), int(max_y)
-
-    video = cv2.VideoWriter(path, cv2.VideoWriter_fourcc(*'mp4v'), int(round((360 / step) / time)), (max_x, max_y))
-    for alpha in range(0, 360, step):
-        new_coords = []
-        for x, y, z in tsp.cities:
-            new_coords.append((
-                x*cos(radians(alpha)) + z*sin(radians(alpha)),
-                y
-            ))
-        new_coords = np.array(new_coords, dtype=np.int)
-        new_coords -= np.array([min_x, min_y])
-
-        new_t = TSP.from_cities(new_coords, w=max_x, h=max_y)
-        visualize_mst_pil(new_t, tour, '/tmp/viz.png')
-        video.write(cv2.imread('/tmp/viz.png'))
-    video.release()
 
 
 def _draw_edges_plt(ax: SubplotBase, tsp: TSP, edges: Iterable[Tuple[int, int]]):

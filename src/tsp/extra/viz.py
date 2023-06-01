@@ -3,12 +3,14 @@
 
 
 from typing import Iterable, Union
+from numbers import Number
+import numpy as np
 from numpy.typing import NDArray
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 from matplotlib.axes import SubplotBase
 
-from tsp.core.viz import _draw_cities_pil, _draw_tour_pil, visualize_tsp_plt
+from tsp.core.viz import _draw_cities_pil, _draw_tour_pil, visualize_tsp_plt, _init_plot
 from tsp.extra.obstacles import TSP_O
 from tsp.extra.color import TSP_Color
 
@@ -88,3 +90,27 @@ def visualize_color_pil(tsp: TSP_Color, tour: Iterable[int], path: str):
     _draw_cities_color_pil(im, tsp)
     im.thumbnail((tsp.w, tsp.h))
     im.save(path)
+
+
+def _draw_cities_color_plt(ax: SubplotBase, tsp: TSP_Color):
+    for city, color in zip(tsp.cities, tsp.colors):
+        coords = [city[0]], [tsp.h - city[1]]
+        ax.plot(*coords, 'o', c=f'C{color}')
+
+
+def _draw_tour_color_plt(ax: SubplotBase, tsp: TSP_Color, tour: Iterable[Union[int, NDArray]]):
+    s = list(tour)
+    if isinstance(s[0], Number):
+        edges = np.array(list(zip(*list(tsp.tour_segments(s)))))
+    else:
+        edges = np.array(list(zip(*s)))
+    edges[1] = tsp.h - edges[1]
+    ax.plot(*edges, 'k-')
+
+
+def visualize_color_plt(tsp: TSP_Color, tour: Iterable[Union[int, NDArray]], ax: SubplotBase = None):
+    ax = _init_plot(ax, tsp)
+
+    if len(tour):
+        _draw_tour_color_plt(ax, tsp, tour)
+    _draw_cities_color_plt(ax, tsp)
