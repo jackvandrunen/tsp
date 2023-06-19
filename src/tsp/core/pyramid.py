@@ -54,7 +54,7 @@ def _cluster_boruvka(nodes: List, k: int):
         n = len(c[-1])
         v.append(list(map(lambda i: [i], range(n))))
 
-        edges = np.zeros((n, n), dtype=np.float)
+        edges = np.zeros((n, n), dtype=np.float64)
         for i in range(n):
             edges[i, i] = np.inf
             for j in range(i + 1, n):
