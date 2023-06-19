@@ -23,7 +23,7 @@ var MAX_DISTANCE = 16
 
 function checkComplete()
 {
-    return tspTour.length == tspCities.length - 1
+    return tspTour.length == tspCities.length
 }
 
 function distance(xy1, xy2)
@@ -123,7 +123,7 @@ function nextProblem()
                 window.tspCities = response.cities
                 for (var i = 0; i < tspCities.length; i++)
                 {
-                    window.tspCities[i] = [tspCities[i][0], tspCities[i][1], response.colors[i]]
+                    window.tspCities[i] = [tspCities[i][0], tspCities[i][1], COLORS[response.colors[i]]]
                 }
                 window.cHeight = response.height
                 window.cWidth = response.width
@@ -181,6 +181,7 @@ function undoTour(ev)
     if (tspTour.length > 1)
         tourTimes.pop()
     window.tourComplete = false
+    redraw()
 }
 
 function sendTour(ev)
@@ -196,6 +197,7 @@ function sendTour(ev)
 
 function buildTour(ev)
 {
+    console.log("Current tour: " + tspTour)
     if (tourComplete)
     {
         restartTour()
@@ -211,14 +213,14 @@ function buildTour(ev)
         if (dist < min)
         {
             min = dist
-            nextCity = tspCities[i]
+            nextCity = i
         }
     }
     if (min > MAX_DISTANCE)
         nextCity = null
     if (nextCity === null)
     {
-        // alert("No active vertices!")
+        console.log("No active vertices!")
         return
     }
     tourTimes.push(new Date().getTime())
@@ -226,9 +228,10 @@ function buildTour(ev)
     if (checkComplete())
     {
         window.tourComplete = true
-        redraw()
+        tspTour.push(tspTour[0])
         setTimeout(function(){ alert("Tour complete!"); }, 100);
     }
+    redraw()
 }
 
 function cancelReload(ev)
