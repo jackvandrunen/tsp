@@ -78,7 +78,8 @@ def _get_tour(id_: int):
     id_ = MAPPING[id_]
     tour_cities, tour_times = json.loads(request.forms.get('data')) # pylint: disable=no-member
     tour_cities = tour_cities[:-1]
-    assert len(tour_cities) == len(tour_times)
+    if len(tour_cities) != len(tour_times):
+        print(f'Warning: {len(tour_cities)} cities recorded, but {len(tour_times)} times recorded!')
     save_list_item(tour_cities, tour_dir, 'sol', id_ + 1)
     save_list_item(tour_times, tour_dir, 'time', id_ + 1)
     return ['Done']

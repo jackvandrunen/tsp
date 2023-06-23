@@ -53,7 +53,7 @@ def score_tours_absolute(problems: List[N_TSP], tours: List[Union[int, NDArray]]
     Returns:
         NDArray: tour lengths
     """
-    result = np.ndarray((len(problems),), dtype=np.float)
+    result = np.ndarray((len(problems),), dtype=np.float64)
     for i, (p, t) in enumerate(zip(problems, tours)):
         result[i] = p.score(t)
     return result
@@ -85,7 +85,7 @@ def score_tours_relative(problems: List[N_TSP], tours: List[Union[int, NDArray]]
     Returns:
         Tuple[NDArray, float, float]: (proportional errors, mean error, standard error of mean)
     """
-    errors = np.ndarray((len(problems),), dtype=np.float)
+    errors = np.ndarray((len(problems),), dtype=np.float64)
     for i, (p, t, b) in enumerate(zip(problems, tours, base_tours)):
         tour_score = p.score(t)
         base_score = p.score(b)

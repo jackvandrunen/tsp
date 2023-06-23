@@ -178,7 +178,7 @@ function undoTour(ev)
     if (tspTour.length === 0)
         return
     tspTour.pop()
-    if (tspTour.length > 1)
+    if (!tourComplete)
         tourTimes.pop()
     window.tourComplete = false
     redraw()
